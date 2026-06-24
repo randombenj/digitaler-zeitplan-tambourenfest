@@ -1,8 +1,8 @@
 {
-  "name": "arth-steinen-23",
+  "name": "digitaler-zeitplan-tambourenfest",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://arth-steinen-23.ch",
+  "homepage": "https://randombenj.github.io/digitaler-zeitplan-tambourenfest",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",

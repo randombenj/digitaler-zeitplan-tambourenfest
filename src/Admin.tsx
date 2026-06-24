@@ -1,20 +1,20 @@
 import { Add, CloudUpload, Delete } from '@mui/icons-material';
 import {
-  Alert,
-  Autocomplete,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  LinearProgress,
-  Paper,
-  Step,
-  StepLabel,
-  Stepper,
-  TextField,
-  Typography
+    Alert,
+    Autocomplete,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    Grid,
+    LinearProgress,
+    Paper,
+    Step,
+    StepLabel,
+    Stepper,
+    TextField,
+    Typography
 } from '@mui/material';
 import { Octokit } from '@octokit/rest';
 import React, { useEffect, useState } from 'react';
@@ -48,6 +48,10 @@ const STEPS = [
   'Alle Änderungen atomisch committen'
 ];
 
+const REPO_OWNER = 'randombenj';
+const REPO_NAME = 'digitaler-zeitplan-tambourenfest';
+const SITE_URL = `https://${REPO_OWNER}.github.io/${REPO_NAME}`;
+
 export default function Admin() {
   const [existingEvents, setExistingEvents] = useState<ExistingEvent[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(false);
@@ -72,7 +76,7 @@ export default function Admin() {
     const loadEventsFromJson = async () => {
       setIsLoadingEvents(true);
       try {
-        const response = await fetch('/events.json');
+        const response = await fetch(`${process.env.PUBLIC_URL}/events.json`);
         if (response.ok) {
           const events: ExistingEvent[] = await response.json();
           setExistingEvents(events);
@@ -190,8 +194,8 @@ export default function Admin() {
   const getFileInfo = async (octokit: Octokit, path: string): Promise<{ content: string; sha: string } | null> => {
     try {
       const { data: file } = await octokit.rest.repos.getContent({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         path
       });
 
@@ -257,8 +261,8 @@ export default function Admin() {
       // Get current commit SHA
       setProcessing(prev => ({ ...prev, step: 3, message: 'Bereite atomische Löschung vor...' }));
       const { data: ref } = await octokit.rest.git.getRef({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         ref: 'heads/master'
       });
 
@@ -266,15 +270,15 @@ export default function Admin() {
 
       // Get the current tree
       const { data: currentCommit } = await octokit.rest.git.getCommit({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         commit_sha: currentCommitSha
       });
 
       // Get the current tree contents
       const { data: currentTree } = await octokit.rest.git.getTree({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         tree_sha: currentCommit.tree.sha,
         recursive: 'true'
       });
@@ -309,16 +313,16 @@ export default function Admin() {
 
       // Create new tree atomically
       const { data: newTree } = await octokit.rest.git.createTree({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         tree: newTreeItems
       });
 
       // Create single atomic commit
       setProcessing(prev => ({ ...prev, step: 5, message: 'Erstelle atomischen Commit...' }));
       const { data: newCommit } = await octokit.rest.git.createCommit({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         message: `Delete zeitplan ${formData.eventName}`,
         tree: newTree.sha,
         parents: [currentCommitSha]
@@ -326,8 +330,8 @@ export default function Admin() {
 
       // Update the reference
       await octokit.rest.git.updateRef({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         ref: 'heads/master',
         sha: newCommit.sha
       });
@@ -398,22 +402,22 @@ export default function Admin() {
 
       // Get current commit and tree
       const { data: ref } = await octokit.rest.git.getRef({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         ref: 'heads/master'
       });
 
       const currentCommitSha = ref.object.sha;
       const { data: currentCommit } = await octokit.rest.git.getCommit({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         commit_sha: currentCommitSha
       });
 
       // Get the current tree contents
       const { data: currentTree } = await octokit.rest.git.getTree({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         tree_sha: currentCommit.tree.sha,
         recursive: 'true'
       });
@@ -485,8 +489,8 @@ export default function Admin() {
 
       // Create new tree atomically
       const { data: newTree } = await octokit.rest.git.createTree({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         tree: newTreeItems
       });
 
@@ -496,8 +500,8 @@ export default function Admin() {
 
       // Create single atomic commit
       const { data: newCommit } = await octokit.rest.git.createCommit({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         message: commitMessage,
         tree: newTree.sha,
         parents: [currentCommitSha]
@@ -505,8 +509,8 @@ export default function Admin() {
 
       // Update the reference
       await octokit.rest.git.updateRef({
-        owner: 'randombenj',
-        repo: 'arth-steinen-23',
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
         ref: 'heads/master',
         sha: newCommit.sha
       });
@@ -766,7 +770,7 @@ export default function Admin() {
             1. <strong>Zeitplan Name:</strong> Wähle einen bestehenden Zeitplan aus der Liste oder erstelle einen neuen im Format "ort-jahr" (z.B. lenzburg-25)<br />
             2. <strong>Zeitplan Excel:</strong> Excel-Datei mit Spalten für Datum, Zeit, Teilnehmer, etc.<br />
             3. <strong>Wettspielorte Excel:</strong> Excel-Datei mit Spalten: <b>Abkürzung, Google Maps URL</b><br />
-            4. <strong>GitHub Token:</strong> Personal Access Token mit 'repo' Berechtigung für randombenj/arth-steinen-23<br />
+            4. <strong>GitHub Token:</strong> Personal Access Token mit 'repo' Berechtigung für {REPO_OWNER}/{REPO_NAME}<br />
             <br />
             Die Anwendung wird automatisch alle notwendigen Dateien erstellen und die Routen konfigurieren.
           </Typography>
@@ -775,7 +779,7 @@ export default function Admin() {
             Beispiel: Wettspielorte Excel Format
           </Typography>
           <Box component="img"
-               src="/wettspielorte-sample.png"
+               src={`${process.env.PUBLIC_URL}/wettspielorte-sample.png`}
                alt="Beispiel für Wettspielorte Excel Format"
                sx={{
                  maxWidth: '100%',
@@ -810,7 +814,7 @@ export default function Admin() {
               whiteSpace: 'pre-wrap'
             }}
           >
-{`<iframe id="zeitplan" src="https://arth-steinen-23.ch/#/ZEITPLAN-JAHR"
+{`<iframe id="zeitplan" src="${SITE_URL}/#/ZEITPLAN-JAHR"
         style="border: 0px; min-height: 400px; height: 680px;"
         width="100%"></iframe>
 <script>

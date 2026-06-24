@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
@@ -8,6 +7,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { createHashRouter, RouteObject, RouterProvider } from 'react-router-dom';
 import Admin from './Admin';
 import DigitalTimeguide from './DigitalTimeguide';
+import Home from './Home';
 
 interface EventConfig {
   name: string;
@@ -38,7 +38,7 @@ function AppRouter() {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const response = await fetch('/events.json');
+        const response = await fetch(`${process.env.PUBLIC_URL}/events.json`);
         if (response.ok) {
           const eventsData: EventConfig[] = await response.json();
           setEvents(eventsData);
@@ -63,7 +63,7 @@ function AppRouter() {
   const routes: RouteObject[] = [
     {
       path: "/",
-      element: <App />,
+      element: <Home events={events} />,
     },
     {
       path: "/admin",
@@ -78,8 +78,8 @@ function AppRouter() {
       element: <DigitalTimeguide
         primaryColor={event.primaryColor}
         name={event.name}
-        timetable={`/${event.name}/zeitplan.csv`}
-        competitionVenues={`/${event.name}/wettspielorte.json`}
+        timetable={`${process.env.PUBLIC_URL}/${event.name}/zeitplan.csv`}
+        competitionVenues={`${process.env.PUBLIC_URL}/${event.name}/wettspielorte.json`}
       />
     });
   });
